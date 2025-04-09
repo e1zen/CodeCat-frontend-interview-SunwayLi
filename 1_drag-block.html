@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可拖拽积木块</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            border: 2px solid #333;
+            background-color: #fff;
+            overflow: hidden;
+        }
+        
+        .block {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: blue;
+            left: 200px;
+            top: 200px;
+        }
+        
+        .dragging {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="block" id="draggable"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const block = document.getElementById('draggable');
+            const container = document.querySelector('.container');
+            
+            let isDragging = false;
+            let offsetX, offsetY;
+            
+            // 鼠标按下时的处理
+            block.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                block.classList.add('dragging');
+                
+                // 计算鼠标在块内的偏移量
+                const rect = block.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                
+                e.preventDefault();
+            });
+            
+            // 鼠标移动时的处理
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                // 计算块的新位置
+                let newLeft = e.clientX - offsetX - container.getBoundingClientRect().left;
+                let newTop = e.clientY - offsetY - container.getBoundingClientRect().top;
+                
+                // 限制在容器范围内
+                const maxLeft = container.clientWidth - block.clientWidth;
+                const maxTop = container.clientHeight - block.clientHeight;
+                
+                newLeft = Math.max(0, Math.min(maxLeft, newLeft));
+                newTop = Math.max(0, Math.min(maxTop, newTop));
+                
+                // 更新块的位置
+                block.style.left = newLeft + 'px';
+                block.style.top = newTop + 'px';
+            });
+            
+            // 鼠标松开时的处理
+            document.addEventListener('mouseup', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    block.classList.remove('dragging');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
